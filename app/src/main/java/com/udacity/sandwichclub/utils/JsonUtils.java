@@ -4,8 +4,12 @@ import android.util.Log;
 
 import com.udacity.sandwichclub.model.Sandwich;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class JsonUtils {
 
@@ -13,21 +17,35 @@ public class JsonUtils {
 
     public static Sandwich parseSandwichJson(String json) {
 
-        try{
+        try {
             JSONObject sandwichJSON = new JSONObject(json);
             JSONObject sandwichName = sandwichJSON.getJSONObject("name");
 
             String sandwichMainName = sandwichName.getString("mainName");
-            String sandwichAKAName = sandwichName.getString("alsoKnownAs");
             String sandwichOrigin = sandwichJSON.getString("placeOfOrigin");
             String sandwichDescription = sandwichJSON.getString("description");
             String sandwichImage = sandwichJSON.getString("image");
 
-            Log.v(TAG, "Sandwich main name : " + sandwichMainName +" AKA name : " + sandwichAKAName + "Origin : "  + sandwichOrigin + " description : " + sandwichDescription + " image : " + sandwichImage);
+            JSONArray sandwichAKAName = sandwichName.getJSONArray("alsoKnownAs");
+            JSONArray sandwichIngredients = sandwichJSON.getJSONArray("ingredients");
 
-        }
-        catch(JSONException e){
-            Log.e( TAG, "Exception", e);
+            List<String> AKAList = new ArrayList<>();
+            for (int i = 0; i < sandwichAKAName.length(); i++) {
+                AKAList.add(sandwichAKAName.getString(i));
+            }
+
+            List<String> ingredientsList = new ArrayList<>();
+            for (int i = 0; i < sandwichIngredients.length(); i++) {
+                ingredientsList.add(sandwichIngredients.getString(i));
+            }
+
+            // Logging - set just for testing
+            //Log.v(TAG, "Sandwich main name : " + sandwichMainName + " AKA name : " + AKAList + " ingredients : " + ingredientsList + "Origin : " + sandwichOrigin + " description : " + sandwichDescription + " image : " + sandwichImage);
+
+            Sandwich chosenSandwich = new Sandwich(sandwichMainName, AKAList, sandwichOrigin, sandwichDescription, sandwichImage, ingredientsList);
+            return chosenSandwich;
+        } catch (JSONException e) {
+            Log.e(TAG, "Exception", e);
         }
 
         return null;
